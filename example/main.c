@@ -35,19 +35,29 @@ int main(void)
         APP_ERROR_CHECK(nrf_drv_gpiote_init());
     }
 
-    dht_config dht22;
-    memset(&dht22, 0, sizeof(dht22));
-    dht22.timer = &timer;
-    dht22.pin = PIN_DHT;
+    dht_config dht22_timer;
+    memset(&dht22_timer, 0, sizeof(dht22_timer));
+    dht22_timer.timer = &timer;
+    dht22_timer.pin = PIN_DHT;
+
+    dht_config dht22_delay;
+    memset(&dht22_delay, 0, sizeof(dht22_delay));
+    dht22_delay.pin = PIN_DHT;
 
     NRF_LOG_INFO("Starting measurement...");
 
     while (true)
     {
-        while(NRF_LOG_PROCESS() == true);
-        dht_read_wait(&dht22);
-        NRF_LOG_INFO("T: " NRF_LOG_FLOAT_MARKER, NRF_LOG_FLOAT(dht_temperature(&dht22)));
-        NRF_LOG_INFO("H: " NRF_LOG_FLOAT_MARKER, NRF_LOG_FLOAT(dht_humidity(&dht22)));
+        dht_read_wait(&dht22_timer);
+        NRF_LOG_INFO("TIMER T: " NRF_LOG_FLOAT_MARKER, NRF_LOG_FLOAT(dht_temperature(&dht22_timer)));
+        NRF_LOG_INFO("TIMER H: " NRF_LOG_FLOAT_MARKER, NRF_LOG_FLOAT(dht_humidity(&dht22_timer)));
+        NRF_LOG_FLUSH();
+        nrf_delay_ms(1000);
+
+        dht_read_wait(&dht22_delay);
+        NRF_LOG_INFO("DELAY T: " NRF_LOG_FLOAT_MARKER, NRF_LOG_FLOAT(dht_temperature(&dht22_delay)));
+        NRF_LOG_INFO("DELAY H: " NRF_LOG_FLOAT_MARKER, NRF_LOG_FLOAT(dht_humidity(&dht22_delay)));
+        NRF_LOG_FLUSH();
         nrf_delay_ms(1000);
     }
 }
